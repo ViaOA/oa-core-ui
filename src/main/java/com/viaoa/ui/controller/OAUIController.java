@@ -25,13 +25,12 @@ import com.viaoa.converter.OAConv;
 import com.viaoa.converter.OAConverter;
 import com.viaoa.datasource.OADataSource;
 import com.viaoa.find.OAFinder;
-import com.viaoa.graph.OAGraphInternal;
+import com.viaoa.graph.api.internal.OAGraphInternal;
 import com.viaoa.graph.service.object.OAObjectCallbackService;
 import com.viaoa.graph.service.object.OAObjectReflectService;
 import com.viaoa.hub.Hub;
 import com.viaoa.metadata.OALinkInfo;
 import com.viaoa.metadata.OAPropertyInfo;
-import com.viaoa.model.oa.VString;
 import com.viaoa.object.*;
 import com.viaoa.path.OAPath;
 import com.viaoa.runtime.OARuntime;
@@ -44,6 +43,7 @@ import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.hub.listener.HubChangeListener.HubProp;
 import com.viaoa.hub.util.HubTemp;
 import com.viaoa.lang.OAString;
+import com.viaoa.lang.oa.VString;
 import com.viaoa.template.OATemplate;
 import com.viaoa.undo.OAUndoableEdit;
 
@@ -946,7 +946,7 @@ public abstract class OAUIController extends HubListenerAdapter {
         else if (obj instanceof OAObject) {
             if (oaPropertyPath != null && oaPropertyPath.getHasHubProperty()) {
                 final VString vs = new VString("");
-                OAFinder finder = new OAFinder(oaPropertyPath.getPropertyPathLinksOnly()) {
+                OAFinder finder = new OAFinder(oaPropertyPath.getPathLinksOnly()) {
                     @Override
                     protected void onFound(OAObject obj) {
                         Object objx = obj.getProperty(oaPropertyPath.getLastPropertyName());

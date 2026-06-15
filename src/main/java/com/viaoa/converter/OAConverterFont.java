@@ -17,6 +17,8 @@ package com.viaoa.converter;
 
 import java.awt.Font;
 
+import com.viaoa.converter.internal.OAConverterInterface;
+
 /**
  * Converter for transforming values into {@link Font} objects and formatting
  * them into a canonical, decodable {@link String} representation.

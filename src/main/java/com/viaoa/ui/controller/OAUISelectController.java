@@ -16,7 +16,7 @@
 package com.viaoa.ui.controller;
 
 import com.viaoa.converter.OAConv;
-import com.viaoa.graph.OAGraphInternal;
+import com.viaoa.graph.api.internal.OAGraphInternal;
 import com.viaoa.hub.*;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.lang.OAArray;

@@ -18,7 +18,7 @@ package com.viaoa.ui.controller;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.viaoa.graph.OAGraphInternal;
+import com.viaoa.graph.api.internal.OAGraphInternal;
 import com.viaoa.hub.*;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.lang.OAArray;

@@ -16,7 +16,7 @@
 package com.viaoa.ui.controller;
 
 import com.viaoa.callback.OAObjectCallback;
-import com.viaoa.graph.OAGraphInternal;
+import com.viaoa.graph.api.internal.OAGraphInternal;
 import com.viaoa.graph.service.object.OAObjectCallbackService;
 import com.viaoa.hub.Hub;
 import com.viaoa.object.OAObject;

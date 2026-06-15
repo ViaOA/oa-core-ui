@@ -17,6 +17,8 @@ package com.viaoa.converter;
 
 import java.awt.Rectangle;
 
+import com.viaoa.converter.internal.OAConverterInterface;
+
 /**
  * Converter for transforming values into {@link Rectangle} objects and
  * formatting them into display-friendly {@link String} representations.

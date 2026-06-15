@@ -17,7 +17,7 @@ package com.viaoa.ui.controller;
 
 import java.util.*;
 
-import com.viaoa.graph.OAGraphInternal;
+import com.viaoa.graph.api.internal.OAGraphInternal;
 import com.viaoa.hub.*;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.hub.listener.HubChangeListener.Type;

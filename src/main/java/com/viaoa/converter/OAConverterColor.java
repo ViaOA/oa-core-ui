@@ -19,6 +19,7 @@ import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.viaoa.converter.internal.OAConverterInterface;
 import com.viaoa.lang.OAString;
 
 /**

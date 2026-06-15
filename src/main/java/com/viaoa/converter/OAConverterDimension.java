@@ -17,6 +17,8 @@ package com.viaoa.converter;
 
 import java.awt.*;
 
+import com.viaoa.converter.internal.OAConverterInterface;
+
 /**
  * Converter for transforming values into {@link Dimension} objects and
  * formatting them into display-friendly {@link String} values.
