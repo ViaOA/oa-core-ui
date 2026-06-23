@@ -95,7 +95,7 @@ public class OAUIMethodController extends OAUIBaseController {
         if (obj == null) return false;
         
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(obj);
-        OAObjectCallback eq = og.objectsInternal().callObjectCallbackGetAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getMethodName());
+        OAObjectCallback eq = og.internal().objects().callbacks().getAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getMethodName());
         return eq.getAllowed();
     }
     
@@ -112,7 +112,7 @@ public class OAUIMethodController extends OAUIBaseController {
         if (!super.isVisible()) return false;
         
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(getHub());
-        OAObjectCallback eq = og.objectsInternal().callObjectCallbackGetAllowVisibleObjectCallback(getHub(), (OAObject) hub.getAO(), getMethodName());
+        OAObjectCallback eq = og.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub(), (OAObject) hub.getAO(), getMethodName());
         return eq.getAllowed();
     }
 
@@ -181,7 +181,7 @@ public class OAUIMethodController extends OAUIBaseController {
 
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(hub, obj);
         // 1: confirm
-        cb = og.objectsInternal().callObjectCallbackGetConfirmCommandObjectCallback(obj, getMethodName(), getConfirmMessage(), getTitle());
+        cb = og.internal().objects().callbacks().getConfirmCommandObjectCallback(obj, getMethodName(), getConfirmMessage(), getTitle());
         s = cb.getConfirmMessage();
         if (OAStr.isNotEmpty(s)) {
             if (!onConfirm(s, OAStr.notEmpty(cb.getConfirmTitle(), getTitle()) )) {
@@ -190,7 +190,7 @@ public class OAUIMethodController extends OAUIBaseController {
         }
         
         // 2: verify
-        cb = og.objectsInternal().callObjectCallbackGetVerifyCommandObjectCallback(obj, getMethodName(), OAObjectCallback.CHECK_ALL);
+        cb = og.internal().objects().callbacks().getVerifyCommandObjectCallback(obj, getMethodName(), OAObjectCallback.CHECK_ALL);
         if (!cb.getAllowed()) {
             onError(cb.getResponse(), cb.getDisplayResponse());
             resp.bCompleted = false;

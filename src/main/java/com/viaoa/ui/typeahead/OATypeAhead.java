@@ -535,17 +535,17 @@ public class OATypeAhead<F extends OAObject,T extends OAObject> {
      */
     public T findObjectUsingId(String id) {
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(classTo);
-        final OAObjectKey ok = og.objectsInternal().callObjectKeyCreateObjectKey(classTo, id);
+        final OAObjectKey ok = og.internal().objects().key().createObjectKey(classTo, id);
         
         if (finder == null) {
             if (hub != null) {
                 for (T obj : ((Hub<T>)hub)) {
-                    if (og.objectsInternal().callObjectKeyIsForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
+                    if (og.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
                 }
             }
             else if (alTo != null) {
                 for (T obj : alTo) {
-                    if (og.objectsInternal().callObjectKeyIsForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
+                    if (og.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
                 }
             }
         }
@@ -553,7 +553,7 @@ public class OATypeAhead<F extends OAObject,T extends OAObject> {
             OAFinder<F, T> finder2 = new OAFinder<F,T>(this.finderPropertyPath) {
                 @Override
                 protected boolean isUsed(T obj) {
-                    return og.objectsInternal().callObjectKeyIsForSameOAObject(null, obj.getObjectKey(), ok);
+                    return og.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok);
                 }
             };
                 

@@ -112,7 +112,7 @@ public class OAUIPropertyController extends OAUIBaseController {
         if (obj == null) return false;
         
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(obj);
-        OAObjectCallback eq = og.objectsInternal().callObjectCallbackGetAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getPropertyName());
+        OAObjectCallback eq = og.internal().objects().callbacks().getAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getPropertyName());
         return eq.getAllowed();
     }
         
@@ -124,7 +124,7 @@ public class OAUIPropertyController extends OAUIBaseController {
         if (!super.isVisible()) return false;
         
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(getHub(), obj);
-        OAObjectCallback eq = og.objectsInternal().callObjectCallbackGetAllowVisibleObjectCallback(getHub(), obj, getPropertyName());
+        OAObjectCallback eq = og.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub(), obj, getPropertyName());
         return eq.getAllowed();
     }
     
@@ -195,7 +195,7 @@ public class OAUIPropertyController extends OAUIBaseController {
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(getHub(), obj);
         
         // 1: confirm
-        cb = og.objectsInternal().callObjectCallbackGetConfirmPropertyChangeObjectCallback(obj, getPropertyName(), newValue, getConfirmMessage(), getTitle());
+        cb = og.internal().objects().callbacks().getConfirmPropertyChangeObjectCallback(obj, getPropertyName(), newValue, getConfirmMessage(), getTitle());
         s = cb.getConfirmMessage();
         if (OAStr.isNotEmpty(s)) {
             if (!onConfirm(s, OAStr.notEmpty(cb.getConfirmTitle(), getTitle()) )) {
@@ -204,7 +204,7 @@ public class OAUIPropertyController extends OAUIBaseController {
         }
         
         // 2: verify
-        cb = og.objectsInternal().callObjectCallbackGetVerifyPropertyChangeObjectCallback(OAObjectCallback.CHECK_ALL, obj, getPropertyName(), null, newValue); 
+        cb = og.internal().objects().callbacks().getVerifyPropertyChangeObjectCallback(OAObjectCallback.CHECK_ALL, obj, getPropertyName(), null, newValue); 
         if (!cb.getAllowed()) {
             onError(cb.getResponse(), cb.getDisplayResponse());
             return false;

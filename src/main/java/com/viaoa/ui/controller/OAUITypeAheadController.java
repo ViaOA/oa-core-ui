@@ -160,9 +160,9 @@ public abstract class OAUITypeAheadController extends OAUIController {
         }
         else {
     		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(hub);
-            Hub hubx = og.hubsInternal().callHubDetailGetMasterHub(hub);
+            Hub hubx = og.internal().hubs().detail().getMasterHub(hub);
             if (hubx != null) {
-                OALinkInfo li = og.hubsInternal().callHubDetailGetLinkInfoFromMasterToDetail(hub);
+                OALinkInfo li = og.internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
                 if (li != null && li.getType() == li.TYPE_ONE) {
                     hubLink = hubx;
                     linkPropertyName = li.getName();

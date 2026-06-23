@@ -26,8 +26,6 @@ import com.viaoa.converter.OAConverter;
 import com.viaoa.datasource.OADataSource;
 import com.viaoa.find.OAFinder;
 import com.viaoa.graph.api.internal.OAGraphInternal;
-import com.viaoa.graph.service.object.OAObjectCallbackService;
-import com.viaoa.graph.service.object.OAObjectReflectService;
 import com.viaoa.hub.Hub;
 import com.viaoa.metadata.OALinkInfo;
 import com.viaoa.metadata.OAPropertyInfo;
@@ -568,8 +566,8 @@ public abstract class OAUIController extends HubListenerAdapter {
                     addVisibleObjectCallbackCheck(hub, prop);
                 }
                 else {
-                	og.objectsInternal().callObjectCallbackAddObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getEnabledChangeListener(), true);
-                	og.objectsInternal().callObjectCallbackAddObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getVisibleChangeListener(), false);
+                	og.internal().objects().callbacks().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getEnabledChangeListener(), true);
+                	og.internal().objects().callbacks().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getVisibleChangeListener(), false);
                 }
                 ppPrefix += prop + ".";
                 cz = oaPropertyPath.getClasses()[cnt++];
@@ -868,9 +866,9 @@ public abstract class OAUIController extends HubListenerAdapter {
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph((OAObject) fromObject);
         if (fromParentClass == null || !fromParentClass.equals(fromObject.getClass())) {
             fromParentClass = fromObject.getClass();
-            fromParentPropertyPath = og.objectsInternal().callObjectReflectGetPropertyPathFromMaster((OAObject) fromObject, getHub());
+            fromParentPropertyPath = og.internal().objects().reflect().getPropertyPathFromMaster((OAObject) fromObject, getHub());
         }
-        return og.objectsInternal().callObjectReflectGetProperty((OAObject) fromObject, fromParentPropertyPath);
+        return og.internal().objects().reflect().getProperty((OAObject) fromObject, fromParentPropertyPath);
     }
 
     /**
@@ -893,7 +891,7 @@ public abstract class OAUIController extends HubListenerAdapter {
 
         if (bIsHubCalc) {
     		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(getHub());
-            obj = og.objectsInternal().callObjectReflectGetProperty(getHub(), propertyPath);
+            obj = og.internal().objects().reflect().getProperty(getHub(), propertyPath);
         }
         else {
             if (OAString.isEmpty(propertyPath)) {
@@ -1140,7 +1138,7 @@ public abstract class OAUIController extends HubListenerAdapter {
             }
             if (objx instanceof OAObject) {
         		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph((OAObject) objx);
-                OAObjectCallback em = og.objectsInternal().callObjectCallbackGetConfirmPropertyChangeObjectCallback((OAObject) objx, prop, newValue, confirmMessage, confirmTitle);
+                OAObjectCallback em = og.internal().objects().callbacks().getConfirmPropertyChangeObjectCallback((OAObject) objx, prop, newValue, confirmMessage, confirmTitle);
                 confirmMessage = em.getConfirmMessage();
                 confirmTitle = em.getConfirmTitle();
             }
@@ -1260,7 +1258,7 @@ public abstract class OAUIController extends HubListenerAdapter {
         String result = null;
         if (objx instanceof OAObject) {
     		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph((OAObject) objx);
-            OAObjectCallback em = og.objectsInternal().callObjectCallbackGetVerifyPropertyChangeObjectCallback(OAObjectCallback.CHECK_ALL, (OAObject) objx, prop, null, newValue);
+            OAObjectCallback em = og.internal().objects().callbacks().getVerifyPropertyChangeObjectCallback(OAObjectCallback.CHECK_ALL, (OAObject) objx, prop, null, newValue);
             if (!em.getAllowed()) {
                 result = em.getResponse();
                 Throwable t = em.getThrowable();
@@ -1326,7 +1324,7 @@ public abstract class OAUIController extends HubListenerAdapter {
                 }
                 if (objx instanceof OAObject) {
             		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph((OAObject) objx);
-                    return og.objectsInternal().callObjectCallbackGetFormat((OAObject) objx, endPropertyName, defaultFormat);
+                    return og.internal().objects().callbacks().getFormat((OAObject) objx, endPropertyName, defaultFormat);
                 }
             }
         }
@@ -2270,7 +2268,7 @@ public abstract class OAUIController extends HubListenerAdapter {
             }
             if (objx instanceof OAObject) {
         		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph((OAObject) objx);
-                ttDefault = og.objectsInternal().callObjectCallbackGetToolTip((OAObject) objx, endPropertyName, ttDefault);
+                ttDefault = og.internal().objects().callbacks().getToolTip((OAObject) objx, endPropertyName, ttDefault);
             }
         }
         else {
@@ -2684,6 +2682,14 @@ public abstract class OAUIController extends HubListenerAdapter {
      */
     public String getCompletedMessage() {
         return this.completedMessage;
+    }
+
+    public OAGraphInternal getGraph() {
+    	Class<? extends OAObject> c;
+    	if (hub != null) c = hub.getObjectClass();
+    	else c = null;
+    	OAGraphInternal og = (OAGraphInternal) OARuntime.graph(c);
+    	return og;
     }
 
     

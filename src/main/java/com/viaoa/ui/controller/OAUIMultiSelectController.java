@@ -58,7 +58,7 @@ public class OAUIMultiSelectController extends OAUIBaseController {
     public boolean isEnabled() {
         if (!super.isEnabled()) return false;
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(hub);
-        OAObjectCallback eq = og.objectsInternal().callObjectCallbackGetAllowEnabledObjectCallback(getHub());
+        OAObjectCallback eq = og.internal().objects().callbacks().getAllowEnabledObjectCallback(getHub());
         return eq.getAllowed();
     }
     
@@ -73,7 +73,7 @@ public class OAUIMultiSelectController extends OAUIBaseController {
     public boolean isVisible() {
         if (!super.isVisible()) return false;
 		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(getHub());
-        OAObjectCallback eq = og.objectsInternal().callObjectCallbackGetAllowVisibleObjectCallback(getHub());
+        OAObjectCallback eq = og.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub());
         return eq.getAllowed();
     }
 

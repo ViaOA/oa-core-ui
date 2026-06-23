@@ -332,9 +332,9 @@ public abstract class OAUISelectController  {
             linkPropertyName = hub.getLinkPath(true);
         }
         else {
-            Hub hubx = og.hubsInternal().callHubDetailGetMasterHub(hub);
+            Hub hubx = og.internal().hubs().detail().getMasterHub(hub);
             if (hubx != null) {
-                OALinkInfo li = og.hubsInternal().callHubDetailGetLinkInfoFromMasterToDetail(hub);
+                OALinkInfo li = og.internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
                 if (li != null && li.getType() == li.TYPE_ONE) {
                     hubLink = hubx;
                     linkPropertyName = li.getName();
@@ -343,7 +343,7 @@ public abstract class OAUISelectController  {
         }
 
         if (hubLink == null) return null;
-        linkOnPos = og.hubsInternal().callHubLinkGetLinkedOnPos(hub);
+        linkOnPos = og.internal().hubs().link().getLinkedOnPos(hub);
         
         controlLinkHub = new OAUIController(hubLink, null, linkPropertyName, true, HubChangeListener.Type.AoNotNull) {
             @Override
