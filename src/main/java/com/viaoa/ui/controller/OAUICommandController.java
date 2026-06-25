@@ -18,7 +18,7 @@ package com.viaoa.ui.controller;
 import java.util.logging.Logger;
 
 import com.viaoa.callback.OAObjectCallback;
-import com.viaoa.graph.api.internal.OAGraphInternal;
+import com.viaoa.graph.OAGraph;
 import com.viaoa.graph.service.object.OAObjectCallbackService;
 import com.viaoa.graph.service.object.OAObjectReflectService;
 import com.viaoa.hub.*;
@@ -285,7 +285,7 @@ public class OAUICommandController extends OAUIController {
         final int pos = hub.getPos();
         OAObjectCallback cb = null; 
         
-		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(hub, obj);
+		final OAGraph og = OARuntime.graph(hub, obj);
 
         switch (command) {
         case OtherUsesHub:
@@ -394,7 +394,7 @@ public class OAUICommandController extends OAUIController {
         String s;
         boolean bUseNewObject = false;
         
-		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(hub, obj);
+		final OAGraph og = OARuntime.graph(hub, obj);
 		        
         // Step 1: get or create newObject
         cb = null;

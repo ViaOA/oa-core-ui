@@ -24,7 +24,7 @@ import com.viaoa.converter.OAConv;
 import com.viaoa.converter.OAConverter;
 import com.viaoa.filter.OAFilter;
 import com.viaoa.find.OAFinder;
-import com.viaoa.graph.api.internal.OAGraphInternal;
+import com.viaoa.graph.OAGraph;
 import com.viaoa.graph.service.object.OAObjectKeyService;
 import com.viaoa.hub.*;
 import com.viaoa.lang.OAString;
@@ -534,7 +534,7 @@ public class OATypeAhead<F extends OAObject,T extends OAObject> {
      * @return the matching object, or null if not found
      */
     public T findObjectUsingId(String id) {
-		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(classTo);
+		final OAGraph og = OARuntime.graph(classTo);
         final OAObjectKey ok = og.internal().objects().key().createObjectKey(classTo, id);
         
         if (finder == null) {

@@ -16,7 +16,7 @@
 package com.viaoa.ui.controller;
 
 import com.viaoa.converter.OAConv;
-import com.viaoa.graph.api.internal.OAGraphInternal;
+import com.viaoa.graph.OAGraph;
 import com.viaoa.hub.*;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.lang.OAArray;
@@ -327,7 +327,7 @@ public abstract class OAUISelectController  {
     
         hubLink = hub.getLinkHub(true);
         
-		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(hub);
+		final OAGraph og = OARuntime.graph(hub);
         if (hubLink != null) {
             linkPropertyName = hub.getLinkPath(true);
         }

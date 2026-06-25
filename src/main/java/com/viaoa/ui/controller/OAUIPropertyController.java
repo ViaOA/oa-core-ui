@@ -17,7 +17,7 @@ package com.viaoa.ui.controller;
 
 import com.viaoa.callback.OAObjectCallback;
 import com.viaoa.converter.OAConv;
-import com.viaoa.graph.api.internal.OAGraphInternal;
+import com.viaoa.graph.OAGraph;
 import com.viaoa.graph.service.object.OAObjectCallbackService;
 import com.viaoa.hub.Hub;
 import com.viaoa.lang.OAStr;
@@ -111,7 +111,7 @@ public class OAUIPropertyController extends OAUIBaseController {
         if (!super.isEnabled()) return false;
         if (obj == null) return false;
         
-		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(obj);
+		final OAGraph og = OARuntime.graph(obj);
         OAObjectCallback eq = og.internal().objects().callbacks().getAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getPropertyName());
         return eq.getAllowed();
     }
@@ -123,7 +123,7 @@ public class OAUIPropertyController extends OAUIBaseController {
     public boolean isVisible(OAObject obj) {
         if (!super.isVisible()) return false;
         
-		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(getHub(), obj);
+		final OAGraph og = OARuntime.graph(getHub(), obj);
         OAObjectCallback eq = og.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub(), obj, getPropertyName());
         return eq.getAllowed();
     }
@@ -192,7 +192,7 @@ public class OAUIPropertyController extends OAUIBaseController {
             newValue = text;
         }        
 
-		final OAGraphInternal og = (OAGraphInternal) OARuntime.graph(getHub(), obj);
+		final OAGraph og = OARuntime.graph(getHub(), obj);
         
         // 1: confirm
         cb = og.internal().objects().callbacks().getConfirmPropertyChangeObjectCallback(obj, getPropertyName(), newValue, getConfirmMessage(), getTitle());
