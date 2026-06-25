@@ -24,12 +24,12 @@ import com.viaoa.converter.OAConv;
 import com.viaoa.converter.OAConverter;
 import com.viaoa.filter.OAFilter;
 import com.viaoa.find.OAFinder;
-import com.viaoa.graph.OAGraph;
-import com.viaoa.graph.service.object.OAObjectKeyService;
 import com.viaoa.hub.*;
 import com.viaoa.lang.OAString;
 import com.viaoa.lang.oa.VString;
 import com.viaoa.metadata.OALinkInfo;
+import com.viaoa.oa.OA;
+import com.viaoa.oa.service.object.OAObjectKeyService;
 import com.viaoa.object.OAObject;
 import com.viaoa.object.OAObjectKey;
 import com.viaoa.path.OAPath;
@@ -534,18 +534,18 @@ public class OATypeAhead<F extends OAObject,T extends OAObject> {
      * @return the matching object, or null if not found
      */
     public T findObjectUsingId(String id) {
-		final OAGraph og = OARuntime.graph(classTo);
-        final OAObjectKey ok = og.internal().objects().key().createObjectKey(classTo, id);
+		final OA oa = OARuntime.oa(classTo);
+        final OAObjectKey ok = oa.internal().objects().key().createObjectKey(classTo, id);
         
         if (finder == null) {
             if (hub != null) {
                 for (T obj : ((Hub<T>)hub)) {
-                    if (og.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
+                    if (oa.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
                 }
             }
             else if (alTo != null) {
                 for (T obj : alTo) {
-                    if (og.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
+                    if (oa.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
                 }
             }
         }
@@ -553,7 +553,7 @@ public class OATypeAhead<F extends OAObject,T extends OAObject> {
             OAFinder<F, T> finder2 = new OAFinder<F,T>(this.finderPropertyPath) {
                 @Override
                 protected boolean isUsed(T obj) {
-                    return og.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok);
+                    return oa.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok);
                 }
             };
                 

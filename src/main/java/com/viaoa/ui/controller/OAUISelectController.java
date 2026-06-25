@@ -16,12 +16,12 @@
 package com.viaoa.ui.controller;
 
 import com.viaoa.converter.OAConv;
-import com.viaoa.graph.OAGraph;
 import com.viaoa.hub.*;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.lang.OAArray;
 import com.viaoa.lang.OAStr;
 import com.viaoa.metadata.OALinkInfo;
+import com.viaoa.oa.OA;
 import com.viaoa.object.*;
 import com.viaoa.runtime.OARuntime;
 
@@ -327,14 +327,14 @@ public abstract class OAUISelectController  {
     
         hubLink = hub.getLinkHub(true);
         
-		final OAGraph og = OARuntime.graph(hub);
+		final OA oa = OARuntime.oa(hub);
         if (hubLink != null) {
             linkPropertyName = hub.getLinkPath(true);
         }
         else {
-            Hub hubx = og.internal().hubs().detail().getMasterHub(hub);
+            Hub hubx = oa.internal().hubs().detail().getMasterHub(hub);
             if (hubx != null) {
-                OALinkInfo li = og.internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
+                OALinkInfo li = oa.internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
                 if (li != null && li.getType() == li.TYPE_ONE) {
                     hubLink = hubx;
                     linkPropertyName = li.getName();
@@ -343,7 +343,7 @@ public abstract class OAUISelectController  {
         }
 
         if (hubLink == null) return null;
-        linkOnPos = og.internal().hubs().link().getLinkedOnPos(hub);
+        linkOnPos = oa.internal().hubs().link().getLinkedOnPos(hub);
         
         controlLinkHub = new OAUIController(hubLink, null, linkPropertyName, true, HubChangeListener.Type.AoNotNull) {
             @Override

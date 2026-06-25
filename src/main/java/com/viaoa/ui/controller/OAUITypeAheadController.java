@@ -17,13 +17,13 @@ package com.viaoa.ui.controller;
 
 import java.util.*;
 
-import com.viaoa.graph.OAGraph;
 import com.viaoa.hub.*;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.hub.listener.HubChangeListener.Type;
 import com.viaoa.lang.OAStr;
 import com.viaoa.lang.OAString;
 import com.viaoa.metadata.OALinkInfo;
+import com.viaoa.oa.OA;
 import com.viaoa.object.*;
 import com.viaoa.runtime.OARuntime;
 import com.viaoa.ui.typeahead.OATypeAhead;
@@ -159,10 +159,10 @@ public abstract class OAUITypeAheadController extends OAUIController {
             linkPropertyName = hub.getLinkPath(true);
         }
         else {
-    		final OAGraph og = OARuntime.graph(hub);
-            Hub hubx = og.internal().hubs().detail().getMasterHub(hub);
+    		final OA oa = OARuntime.oa(hub);
+            Hub hubx = oa.internal().hubs().detail().getMasterHub(hub);
             if (hubx != null) {
-                OALinkInfo li = og.internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
+                OALinkInfo li = oa.internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
                 if (li != null && li.getType() == li.TYPE_ONE) {
                     hubLink = hubx;
                     linkPropertyName = li.getName();

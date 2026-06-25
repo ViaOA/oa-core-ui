@@ -18,13 +18,13 @@ package com.viaoa.ui.controller;
 import java.util.logging.Logger;
 
 import com.viaoa.callback.OAObjectCallback;
-import com.viaoa.graph.OAGraph;
-import com.viaoa.graph.service.object.OAObjectCallbackService;
-import com.viaoa.graph.service.object.OAObjectReflectService;
 import com.viaoa.hub.*;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.lang.OAStr;
 import com.viaoa.log.OALogger;
+import com.viaoa.oa.OA;
+import com.viaoa.oa.service.object.OAObjectCallbackService;
+import com.viaoa.oa.service.object.OAObjectReflectService;
 import com.viaoa.object.*;
 import com.viaoa.runtime.OARuntime;
 
@@ -285,7 +285,7 @@ public class OAUICommandController extends OAUIController {
         final int pos = hub.getPos();
         OAObjectCallback cb = null; 
         
-		final OAGraph og = OARuntime.graph(hub, obj);
+		final OA oa = OARuntime.oa(hub, obj);
 
         switch (command) {
         case OtherUsesHub:
@@ -293,7 +293,7 @@ public class OAUICommandController extends OAUIController {
         case OtherUsesAO:
             return hub.getAO() != null; 
         case Save:
-            cb = og.internal().objects().callbacks().getAllowSaveObjectCallback(obj, OAObjectCallback.CHECK_ALL);
+            cb = oa.internal().objects().callbacks().getAllowSaveObjectCallback(obj, OAObjectCallback.CHECK_ALL);
             break;
         case First:
             if (hubSize == 0) return false;
@@ -309,14 +309,14 @@ public class OAUICommandController extends OAUIController {
             break;
         case Delete:
             if (pos < 0) return false;
-            cb = og.internal().objects().callbacks().getAllowDeleteObjectCallback((OAObject) hub.getAO());
+            cb = oa.internal().objects().callbacks().getAllowDeleteObjectCallback((OAObject) hub.getAO());
             break;
         case Remove:
             if (pos < 0) return false;
-            cb = og.internal().objects().callbacks().getAllowRemoveObjectCallback(hub, (OAObject) hub.getAO(), OAObjectCallback.CHECK_ALL);
+            cb = oa.internal().objects().callbacks().getAllowRemoveObjectCallback(hub, (OAObject) hub.getAO(), OAObjectCallback.CHECK_ALL);
             break;
         case RemoveAll:
-            cb = og.internal().objects().callbacks().getAllowRemoveAllObjectCallback(hub, OAObjectCallback.CHECK_ALL);
+            cb = oa.internal().objects().callbacks().getAllowRemoveAllObjectCallback(hub, OAObjectCallback.CHECK_ALL);
             break;
         case Submit:
             if (obj == null) return false;
@@ -327,7 +327,7 @@ public class OAUICommandController extends OAUIController {
         case AddNew:
         case NewManual:
         case AddManual:
-            cb = og.internal().objects().callbacks().getAllowNewObjectCallback(hub);
+            cb = oa.internal().objects().callbacks().getAllowNewObjectCallback(hub);
             break;
         case ManualChangeAO:
             break;
@@ -340,9 +340,9 @@ public class OAUICommandController extends OAUIController {
         case Search:
             break;
         case Copy:
-            cb = og.internal().objects().callbacks().getAllowAddObjectCallback(hub, obj, OAObjectCallback.CHECK_ALL);
+            cb = oa.internal().objects().callbacks().getAllowAddObjectCallback(hub, obj, OAObjectCallback.CHECK_ALL);
             if (cb.getAllowed()) {
-                cb = og.internal().objects().callbacks().getAllowCopyObjectCallback(obj);
+                cb = oa.internal().objects().callbacks().getAllowCopyObjectCallback(obj);
             }
             break;
             
@@ -351,7 +351,7 @@ public class OAUICommandController extends OAUIController {
         case Refresh:
             return pos >= 0;
         case MoveUp:
-            cb = og.internal().objects().callbacks().getAllowNewObjectCallback(hub);
+            cb = oa.internal().objects().callbacks().getAllowNewObjectCallback(hub);
             break;
         case MoveDown:
             break;
@@ -394,7 +394,7 @@ public class OAUICommandController extends OAUIController {
         String s;
         boolean bUseNewObject = false;
         
-		final OAGraph og = OARuntime.graph(hub, obj);
+		final OA oa = OARuntime.oa(hub, obj);
 		        
         // Step 1: get or create newObject
         cb = null;
@@ -430,7 +430,7 @@ public class OAUICommandController extends OAUIController {
             break;
         case InsertNew:
         case AddNew:
-            newObject = (OAObject) og.internal().objects().reflect().createNewObject(hub.getObjectClass());
+            newObject = (OAObject) oa.internal().objects().reflect().createNewObject(hub.getObjectClass());
             bUseNewObject = true;
             break;
         case NewManual:
@@ -456,7 +456,7 @@ public class OAUICommandController extends OAUIController {
         case Search:
             break;
         case Copy:
-            newObject = og.internal().objects().callbacks().getCopy(obj);
+            newObject = oa.internal().objects().callbacks().getCopy(obj);
             bUseNewObject = true;
             break;
         case Select:
@@ -484,7 +484,7 @@ public class OAUICommandController extends OAUIController {
                     return false;
                 }
                 
-                cb = og.internal().objects().callbacks().getConfirmPropertyChangeObjectCallback(objx, propx, newObject, getConfirmMessage(), getTitle());
+                cb = oa.internal().objects().callbacks().getConfirmPropertyChangeObjectCallback(objx, propx, newObject, getConfirmMessage(), getTitle());
                 s = cb.getConfirmMessage();
                 if (OAStr.isNotEmpty(s)) {
                     if (!onConfirm(s, OAStr.notEmpty(cb.getConfirmTitle(), getTitle()) )) return false;
@@ -500,7 +500,7 @@ public class OAUICommandController extends OAUIController {
         case OtherUsesAO:
             break;
         case Save:
-            cb = og.internal().objects().callbacks().getConfirmSaveObjectCallback(obj, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmSaveObjectCallback(obj, getConfirmMessage(), getTitle());
             break;
         case First:
             break;
@@ -511,25 +511,25 @@ public class OAUICommandController extends OAUIController {
         case Previous:
             break;
         case Delete:
-            cb = og.internal().objects().callbacks().getConfirmDeleteObjectCallback(obj, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmDeleteObjectCallback(obj, getConfirmMessage(), getTitle());
             break;
         case Remove:
-            cb = og.internal().objects().callbacks().getConfirmRemoveObjectCallback(hub, obj, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmRemoveObjectCallback(hub, obj, getConfirmMessage(), getTitle());
             break;
         case RemoveAll:
-            cb = og.internal().objects().callbacks().getConfirmRemoveAllObjectCallback(hub, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmRemoveAllObjectCallback(hub, getConfirmMessage(), getTitle());
             break;
         case InsertNew:
-            cb = og.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
             break;
         case AddNew:
-            cb = og.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
             break;
         case NewManual:
-            cb = og.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
             break;
         case AddManual:
-            cb = og.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
             break;
         case ManualChangeAO:
             break;
@@ -542,7 +542,7 @@ public class OAUICommandController extends OAUIController {
         case Search:
             break;
         case Copy:
-            cb = og.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
+            cb = oa.internal().objects().callbacks().getConfirmAddObjectCallback(hub, newObject, getConfirmMessage(), getTitle());
             break;
         case Select:
             break;

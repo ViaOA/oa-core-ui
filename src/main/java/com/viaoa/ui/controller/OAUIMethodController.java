@@ -16,11 +16,11 @@
 package com.viaoa.ui.controller;
 
 import com.viaoa.callback.OAObjectCallback;
-import com.viaoa.graph.OAGraphImpl;
-import com.viaoa.graph.OAGraph;
-import com.viaoa.graph.service.object.OAObjectCallbackService;
 import com.viaoa.hub.Hub;
 import com.viaoa.lang.OAStr;
+import com.viaoa.oa.OA;
+import com.viaoa.oa.OAImpl;
+import com.viaoa.oa.service.object.OAObjectCallbackService;
 import com.viaoa.object.OAObject;
 import com.viaoa.reflect.OAReflect;
 import com.viaoa.runtime.OARuntime;
@@ -94,8 +94,8 @@ public class OAUIMethodController extends OAUIBaseController {
         OAObject obj = (OAObject) hub.getAO();
         if (obj == null) return false;
         
-		final OAGraph og = OARuntime.graph(obj);
-        OAObjectCallback eq = og.internal().objects().callbacks().getAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getMethodName());
+		final OA oa = OARuntime.oa(obj);
+        OAObjectCallback eq = oa.internal().objects().callbacks().getAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getMethodName());
         return eq.getAllowed();
     }
     
@@ -111,8 +111,8 @@ public class OAUIMethodController extends OAUIBaseController {
     public boolean isVisible() {
         if (!super.isVisible()) return false;
         
-		final OAGraph og = OARuntime.graph(getHub());
-        OAObjectCallback eq = og.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub(), (OAObject) hub.getAO(), getMethodName());
+		final OA oa = OARuntime.oa(getHub());
+        OAObjectCallback eq = oa.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub(), (OAObject) hub.getAO(), getMethodName());
         return eq.getAllowed();
     }
 
@@ -179,9 +179,9 @@ public class OAUIMethodController extends OAUIBaseController {
         OAObjectCallback cb; 
         String s;
 
-		final OAGraph og = OARuntime.graph(hub, obj);
+		final OA oa = OARuntime.oa(hub, obj);
         // 1: confirm
-        cb = og.internal().objects().callbacks().getConfirmCommandObjectCallback(obj, getMethodName(), getConfirmMessage(), getTitle());
+        cb = oa.internal().objects().callbacks().getConfirmCommandObjectCallback(obj, getMethodName(), getConfirmMessage(), getTitle());
         s = cb.getConfirmMessage();
         if (OAStr.isNotEmpty(s)) {
             if (!onConfirm(s, OAStr.notEmpty(cb.getConfirmTitle(), getTitle()) )) {
@@ -190,7 +190,7 @@ public class OAUIMethodController extends OAUIBaseController {
         }
         
         // 2: verify
-        cb = og.internal().objects().callbacks().getVerifyCommandObjectCallback(obj, getMethodName(), OAObjectCallback.CHECK_ALL);
+        cb = oa.internal().objects().callbacks().getVerifyCommandObjectCallback(obj, getMethodName(), OAObjectCallback.CHECK_ALL);
         if (!cb.getAllowed()) {
             onError(cb.getResponse(), cb.getDisplayResponse());
             resp.bCompleted = false;
