@@ -530,8 +530,8 @@ public abstract class OAUIController extends HubListenerAdapter {
         if (oaPropertyPath.getEndLinkInfo() != null && properties != null && properties.length == 1) {
             OAOne oaOne = oaPropertyPath.getOAOneAnnotation();
             if (oaOne != null) {
-                if (OAString.isNotEmpty(oaOne.defaultPropertyPath())) {
-                    if (!oaOne.defaultPropertyPathCanBeChanged()) {
+                if (OAString.isNotEmpty(oaOne.defaultPath())) {
+                    if (!oaOne.defaultPathCanBeChanged()) {
                         getEnabledChangeListener().addPropertyNull(hub, properties[0]);
                     }
                 }
@@ -566,8 +566,8 @@ public abstract class OAUIController extends HubListenerAdapter {
                     addVisibleObjectCallbackCheck(hub, prop);
                 }
                 else {
-                	oa.internal().objects().callbacks().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getEnabledChangeListener(), true);
-                	oa.internal().objects().callbacks().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getVisibleChangeListener(), false);
+                	oa.internal().objects().rules().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getEnabledChangeListener(), true);
+                	oa.internal().objects().rules().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getVisibleChangeListener(), false);
                 }
                 ppPrefix += prop + ".";
                 cz = oaPropertyPath.getClasses()[cnt++];
@@ -866,7 +866,7 @@ public abstract class OAUIController extends HubListenerAdapter {
 		final OA oa = OARuntime.oa((OAObject) fromObject);
         if (fromParentClass == null || !fromParentClass.equals(fromObject.getClass())) {
             fromParentClass = fromObject.getClass();
-            fromParentPropertyPath = oa.internal().objects().reflect().getPropertyPathFromMaster((OAObject) fromObject, getHub());
+            fromParentPropertyPath = oa.internal().objects().reflect().getPathFromMaster((OAObject) fromObject, getHub());
         }
         return oa.internal().objects().reflect().getProperty((OAObject) fromObject, fromParentPropertyPath);
     }
@@ -1138,7 +1138,7 @@ public abstract class OAUIController extends HubListenerAdapter {
             }
             if (objx instanceof OAObject) {
         		final OA oa = OARuntime.oa((OAObject) objx);
-                OAObjectCallback em = oa.internal().objects().callbacks().getConfirmPropertyChangeObjectCallback((OAObject) objx, prop, newValue, confirmMessage, confirmTitle);
+                OAObjectCallback em = oa.internal().objects().rules().getConfirmPropertyChangeObjectCallback((OAObject) objx, prop, newValue, confirmMessage, confirmTitle);
                 confirmMessage = em.getConfirmMessage();
                 confirmTitle = em.getConfirmTitle();
             }
@@ -1258,7 +1258,7 @@ public abstract class OAUIController extends HubListenerAdapter {
         String result = null;
         if (objx instanceof OAObject) {
     		final OA oa = OARuntime.oa((OAObject) objx);
-            OAObjectCallback em = oa.internal().objects().callbacks().getVerifyPropertyChangeObjectCallback(OAObjectCallback.CHECK_ALL, (OAObject) objx, prop, null, newValue);
+            OAObjectCallback em = oa.internal().objects().rules().getVerifyPropertyChangeObjectCallback((OAObject) objx, prop, null, newValue);
             if (!em.getAllowed()) {
                 result = em.getResponse();
                 Throwable t = em.getThrowable();
@@ -1324,7 +1324,7 @@ public abstract class OAUIController extends HubListenerAdapter {
                 }
                 if (objx instanceof OAObject) {
             		final OA oa = OARuntime.oa((OAObject) objx);
-                    return oa.internal().objects().callbacks().getFormat((OAObject) objx, endPropertyName, defaultFormat);
+                    return oa.internal().objects().rules().getFormat((OAObject) objx, endPropertyName, defaultFormat);
                 }
             }
         }
@@ -2268,7 +2268,7 @@ public abstract class OAUIController extends HubListenerAdapter {
             }
             if (objx instanceof OAObject) {
         		final OA oa = OARuntime.oa((OAObject) objx);
-                ttDefault = oa.internal().objects().callbacks().getToolTip((OAObject) objx, endPropertyName, ttDefault);
+                ttDefault = oa.internal().objects().rules().getToolTip((OAObject) objx, endPropertyName, ttDefault);
             }
         }
         else {
@@ -2396,7 +2396,7 @@ public abstract class OAUIController extends HubListenerAdapter {
                     if (hpx.hubListener == null) {
                         continue;
                     }
-                    if (!OAString.equals(prop, hpx.propertyPath)) {
+                    if (!OAString.equals(prop, hpx.path)) {
                         continue;
                     }
                     hp = hpx;
@@ -2499,19 +2499,19 @@ public abstract class OAUIController extends HubListenerAdapter {
          */
         protected boolean _assignHubListener(HubProp newHubProp) {
             if (OAUIController.this.hub == newHubProp.hub) {
-                if (newHubProp.propertyPath == null) {
+                if (newHubProp.path == null) {
                     return true;
                 }
-                if (newHubProp.propertyPath.indexOf('.') < 0) {
-                    if (newHubProp.hub.getOAObjectInfo().getCalcInfo(newHubProp.propertyPath) == null) {
+                if (newHubProp.path.indexOf('.') < 0) {
+                    if (newHubProp.hub.getOAObjectInfo().getCalcInfo(newHubProp.path) == null) {
                         // 20221011
-                        OALinkInfo lix = newHubProp.hub.getOAObjectInfo().getLinkInfo(newHubProp.propertyPath);
+                        OALinkInfo lix = newHubProp.hub.getOAObjectInfo().getLinkInfo(newHubProp.path);
                         if (lix == null || lix.getType() == OALinkInfo.ONE) {
                             return true;
                         }
                     }
                 }
-                if (newHubProp.propertyPath.equalsIgnoreCase(OAUIController.this.propertyPath)) {
+                if (newHubProp.path.equalsIgnoreCase(OAUIController.this.propertyPath)) {
                     return true;
                 }
             }
@@ -2520,7 +2520,7 @@ public abstract class OAUIController extends HubListenerAdapter {
             if (h != null) {
                 h = h.getLinkHub(true);
                 if (h != null && h == newHubProp.hub) {
-                    if (newHubProp.propertyPath == null) {
+                    if (newHubProp.path == null) {
                         return true;
                     }
                 }
@@ -2541,17 +2541,17 @@ public abstract class OAUIController extends HubListenerAdapter {
                     if (hp.hubListener == null) {
                         continue;
                     }
-                    if (newHubProp.propertyPath == null) {
+                    if (newHubProp.path == null) {
                         newHubProp.hubListener = hp.hubListener;
                         return true;
                     }
-                    if (newHubProp.propertyPath.indexOf('.') < 0) {
-                        if (newHubProp.hub != null && newHubProp.hub.getOAObjectInfo().getCalcInfo(newHubProp.propertyPath) == null) {
+                    if (newHubProp.path.indexOf('.') < 0) {
+                        if (newHubProp.hub != null && newHubProp.hub.getOAObjectInfo().getCalcInfo(newHubProp.path) == null) {
                             newHubProp.hubListener = hp.hubListener;
                             return true;
                         }
                     }
-                    if (!newHubProp.propertyPath.equalsIgnoreCase(hp.propertyPath)) {
+                    if (!newHubProp.path.equalsIgnoreCase(hp.path)) {
                         continue;
                     }
                     newHubProp.hubListener = hp.hubListener;

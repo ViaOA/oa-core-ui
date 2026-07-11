@@ -23,7 +23,6 @@ import com.viaoa.lang.OAString;
 import com.viaoa.metadata.OAObjectInfo;
 import com.viaoa.metadata.OAPropertyInfo;
 import com.viaoa.oa.OA;
-import com.viaoa.oa.service.object.OAObjectCallbackService;
 import com.viaoa.object.OAObject;
 import com.viaoa.runtime.OARuntime;
 import com.viaoa.secure.OAEncryption;
@@ -112,7 +111,7 @@ public class OAUIPropertyController extends OAUIBaseController {
         if (obj == null) return false;
         
 		final OA oa = OARuntime.oa(obj);
-        OAObjectCallback eq = oa.internal().objects().callbacks().getAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getPropertyName());
+        OAObjectCallback eq = oa.internal().objects().rules().getAllowEnabledObjectCallback(getHub(), obj, getPropertyName());
         return eq.getAllowed();
     }
         
@@ -124,7 +123,7 @@ public class OAUIPropertyController extends OAUIBaseController {
         if (!super.isVisible()) return false;
         
 		final OA oa = OARuntime.oa(getHub(), obj);
-        OAObjectCallback eq = oa.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub(), obj, getPropertyName());
+        OAObjectCallback eq = oa.internal().objects().rules().getAllowVisibleObjectCallback(getHub(), obj, getPropertyName());
         return eq.getAllowed();
     }
     
@@ -195,7 +194,7 @@ public class OAUIPropertyController extends OAUIBaseController {
 		final OA oa = OARuntime.oa(getHub(), obj);
         
         // 1: confirm
-        cb = oa.internal().objects().callbacks().getConfirmPropertyChangeObjectCallback(obj, getPropertyName(), newValue, getConfirmMessage(), getTitle());
+        cb = oa.internal().objects().rules().getConfirmPropertyChangeObjectCallback(obj, getPropertyName(), newValue, getConfirmMessage(), getTitle());
         s = cb.getConfirmMessage();
         if (OAStr.isNotEmpty(s)) {
             if (!onConfirm(s, OAStr.notEmpty(cb.getConfirmTitle(), getTitle()) )) {
@@ -204,7 +203,7 @@ public class OAUIPropertyController extends OAUIBaseController {
         }
         
         // 2: verify
-        cb = oa.internal().objects().callbacks().getVerifyPropertyChangeObjectCallback(OAObjectCallback.CHECK_ALL, obj, getPropertyName(), null, newValue); 
+        cb = oa.internal().objects().rules().getVerifyPropertyChangeObjectCallback(obj, getPropertyName(), null, newValue); 
         if (!cb.getAllowed()) {
             onError(cb.getResponse(), cb.getDisplayResponse());
             return false;

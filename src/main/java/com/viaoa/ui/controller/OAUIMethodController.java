@@ -20,7 +20,6 @@ import com.viaoa.hub.Hub;
 import com.viaoa.lang.OAStr;
 import com.viaoa.oa.OA;
 import com.viaoa.oa.OAImpl;
-import com.viaoa.oa.service.object.OAObjectCallbackService;
 import com.viaoa.object.OAObject;
 import com.viaoa.reflect.OAReflect;
 import com.viaoa.runtime.OARuntime;
@@ -95,7 +94,7 @@ public class OAUIMethodController extends OAUIBaseController {
         if (obj == null) return false;
         
 		final OA oa = OARuntime.oa(obj);
-        OAObjectCallback eq = oa.internal().objects().callbacks().getAllowEnabledObjectCallback(OAObjectCallback.CHECK_ALL, getHub(), obj, getMethodName());
+        OAObjectCallback eq = oa.internal().objects().rules().getAllowEnabledObjectCallback(getHub(), obj, getMethodName());
         return eq.getAllowed();
     }
     
@@ -112,7 +111,7 @@ public class OAUIMethodController extends OAUIBaseController {
         if (!super.isVisible()) return false;
         
 		final OA oa = OARuntime.oa(getHub());
-        OAObjectCallback eq = oa.internal().objects().callbacks().getAllowVisibleObjectCallback(getHub(), (OAObject) hub.getAO(), getMethodName());
+        OAObjectCallback eq = oa.internal().objects().rules().getAllowVisibleObjectCallback(getHub(), (OAObject) hub.getAO(), getMethodName());
         return eq.getAllowed();
     }
 
@@ -181,7 +180,7 @@ public class OAUIMethodController extends OAUIBaseController {
 
 		final OA oa = OARuntime.oa(hub, obj);
         // 1: confirm
-        cb = oa.internal().objects().callbacks().getConfirmCommandObjectCallback(obj, getMethodName(), getConfirmMessage(), getTitle());
+        cb = oa.internal().objects().rules().getConfirmCommandObjectCallback(obj, getMethodName(), getConfirmMessage(), getTitle());
         s = cb.getConfirmMessage();
         if (OAStr.isNotEmpty(s)) {
             if (!onConfirm(s, OAStr.notEmpty(cb.getConfirmTitle(), getTitle()) )) {
@@ -190,7 +189,7 @@ public class OAUIMethodController extends OAUIBaseController {
         }
         
         // 2: verify
-        cb = oa.internal().objects().callbacks().getVerifyCommandObjectCallback(obj, getMethodName(), OAObjectCallback.CHECK_ALL);
+        cb = oa.internal().objects().rules().getVerifyCommandObjectCallback(obj, getMethodName());
         if (!cb.getAllowed()) {
             onError(cb.getResponse(), cb.getDisplayResponse());
             resp.bCompleted = false;
