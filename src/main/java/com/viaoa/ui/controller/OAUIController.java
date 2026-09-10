@@ -391,6 +391,10 @@ public abstract class OAUIController extends HubListenerAdapter {
     public OAUIController(Hub hub, String propertyPath) {
         this(hub, null, propertyPath, true, HubChangeListener.Type.AoNotNull);
     }    
+
+    public OAUIController(Hub hub) {
+        this(hub, null, null, true, HubChangeListener.Type.AoNotNull);
+    }    
     
     /**
      * Constructs a controller using the supplied Hub, optional single object,

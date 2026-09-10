@@ -15,6 +15,8 @@
  */
 package com.viaoa.ui.controller;
 
+import java.lang.reflect.Method;
+
 import com.viaoa.callback.OAObjectCallback;
 import com.viaoa.hub.Hub;
 import com.viaoa.lang.OAStr;
@@ -50,7 +52,7 @@ import com.viaoa.runtime.OARuntime;
  * active object.
  * </p>
  */
-public class OAUIMethodController extends OAUIBaseController {
+public class OAUIMethodController extends OAUIController {
 
 	/**
 	 * The name of the method to invoke on the active OAObject when this
@@ -201,5 +203,29 @@ public class OAUIMethodController extends OAUIBaseController {
         resp.bCompleted = true;
     }
 
+	@Override
+	public void updateComponent(Object object) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateLabel(Object object) {
+		// TODO Auto-generated method stub
+		
+	}
+
+    /**
+     * These allow for overwriting to handle user interactions.
+     */
+    protected boolean onConfirm(String confirmMessage, String title) {
+        return true;
+    }
+
+    protected void onError(String errorMessage, String detailMessage) {
+    }
+    
+    protected void onCompleted(String completedMessage, String title) {
+    }
 
 }

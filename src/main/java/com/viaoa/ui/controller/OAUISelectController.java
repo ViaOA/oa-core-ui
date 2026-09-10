@@ -407,6 +407,7 @@ public abstract class OAUISelectController  {
      * @return the formatted value string for the resolved selection.
      */
     public String getValueAsString(Hub hubFrom, Object obj) {
+    	if (getLinkUIController() == null) return "";//qqqqqqqqq
         Object objx = getLinkUIController().getValue(obj);
         if (linkOnPos && objx instanceof Number) objx = getHub().getAt(OAConv.toInt(objx));  
         String s = getUIController().getValueAsString(objx);
