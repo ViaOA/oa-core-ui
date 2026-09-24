@@ -61,19 +61,13 @@ public abstract class OAUITypeAheadController extends OAUIController {
 	 * values.
 	 */
     private final OATypeAhead typeAhead;
-
-    /**
-     * Lazily created {@link OAUIController} that tracks the linked hub
-     * for the type-ahead's underlying hub and forwards UI update events
-     * back to this controller.
-     */
-    private OAUIController controlLinkHub;
+    private final boolean bInit;
 
     public static class TypeAheadValue {
-        public String id, display, dropDownDisplay;
+        public String guid, display, dropDownDisplay;
         
-        public TypeAheadValue(String id, String display, String dropDownDisplay) {
-            this.id = id;
+        public TypeAheadValue(String guid, String display, String dropDownDisplay) {
+            this.guid = guid;
             this.display = display;
             if (OAStr.isNotEqual(display, dropDownDisplay)) this.dropDownDisplay = dropDownDisplay;
         }
@@ -92,11 +86,12 @@ public abstract class OAUITypeAheadController extends OAUIController {
      *                  controller
      */
     public OAUITypeAheadController(OATypeAhead typeAhead) {
-        super(typeAhead.getHub(), null, null, false, Type.HubValid);
+        super(typeAhead.getHub(), null, null, false, Type.HubValid, true);
+        bInit = true;
         this.typeAhead = typeAhead;
-        getLinkUIController();
+        reset();
     }
-    
+
     /**
      * Returns the {@link OATypeAhead} instance associated with this
      * controller.
@@ -114,79 +109,19 @@ public abstract class OAUITypeAheadController extends OAUIController {
      * method is invoked to clear or reinitialize its state.
      */
     public void reset() {
-        OAUIController c = controlLinkHub;
-        if (c != null) c.reset();
+    	if (!bInit) return;
+    	super.reset();
     }
     
-    /**
-     * Closes the link {@link OAUIController}, if it has been created.
-     * <p>
-     * If the link controller exists, its {@link OAUIController#close()}
-     * method is invoked to release any resources and detach listeners.
-     */
-    public void close() {
-        OAUIController c = controlLinkHub;
-        if (c != null) c.close();
+   
+    @Override
+    public String getValueAsString(Object obj, String fmt, int maxLength) {
+        OATypeAhead ta = getTypeAhead();
+    	String s;
+    	if (ta == null || !(obj instanceof OAObject)) s = ""; 
+    	else s = ta.getDisplayValue((OAObject) obj);
+    	return s;
     }
-    
-    /**
-     * Lazily creates and returns the {@link OAUIController} that tracks
-     * the hub linked to the type-ahead hub.
-     * <p>
-     * The method attempts to determine the link hub in two ways:
-     * <ul>
-     *   <li>By asking the type-ahead hub for its link hub and link path.</li>
-     *   <li>If no link hub exists, by resolving the master hub via
-     *       {@link HubDetailDelegate#getMasterHub(Hub)} and obtaining
-     *       a one-to-one {@link OALinkInfo} from master to detail.</li>
-     * </ul>
-     * If a link hub is found, a new {@link OAUIController} is created
-     * that listens for {@link HubChangeListener.Type#AoNotNull} events
-     * and delegates {@link #updateComponent(Object)} and
-     * {@link #updateLabel(Object)} calls back to this controller.
-     *
-     * @return the link {@link OAUIController}, or {@code null} if no
-     *         suitable link hub can be determined
-     */
-    protected OAUIController getLinkUIController() {
-        if (controlLinkHub != null) return controlLinkHub;
-    
-        Hub hub = getTypeAhead().getHub();
-        Hub hubLink = hub.getLinkHub(true);
-        String linkPropertyName = null;
-        
-        if (hubLink != null) {
-            linkPropertyName = hub.getLinkPath(true);
-        }
-        else {
-    		final OA oa = OARuntime.oa(hub);
-            Hub hubx = oa.internal().hubs().detail().getMasterHub(hub);
-            if (hubx != null) {
-                OALinkInfo li = oa.internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
-                if (li != null && li.getType() == li.TYPE_ONE) {
-                    hubLink = hubx;
-                    linkPropertyName = li.getName();
-                }
-            }
-        }
-
-        if (hubLink == null) return null;
-        
-        controlLinkHub = new OAUIController(hubLink, null, linkPropertyName, true, HubChangeListener.Type.AoNotNull) {
-            @Override
-            public void updateComponent(Object object) {
-                OAUITypeAheadController.this.updateComponent(object);
-            }
-            @Override
-            public void updateLabel(Object object) {
-                OAUITypeAheadController.this.updateLabel(object);
-            }
-        };
-        
-        return controlLinkHub;
-    }
-    
-    
     
     /**
      * Performs a type-ahead search and converts the resulting objects
@@ -211,7 +146,7 @@ public abstract class OAUITypeAheadController extends OAUIController {
         List<OAObject> alObj = ta.search(search);
         if (alObj != null) {
             for (OAObject obj : alObj) {
-                TypeAheadValue tav = new TypeAheadValue(obj.getObjectKey().toString(), ta.getDisplayValue(obj), ta.getDropDownDisplayValue(obj));
+                TypeAheadValue tav = new TypeAheadValue(obj.getObjectKey().getGuid().toString(), ta.getDisplayValue(obj), ta.getDropDownDisplayValue(obj));
                 al.add(tav);
             }
         }
@@ -226,8 +161,8 @@ public abstract class OAUITypeAheadController extends OAUIController {
      * @return the resolved object, or {@code null} if the identifier
      *         cannot be matched
      */
-    public Object findObjectUsingId(String id) {
-        Object obj = getTypeAhead().findObjectUsingId(id);
+    public Object findObjectUsingGuid(String guid) {
+        Object obj = getTypeAhead().findObjectUsingGuid(guid);
         return obj;
     }
  
@@ -253,7 +188,7 @@ public abstract class OAUITypeAheadController extends OAUIController {
         for (TypeAheadValue tav : al) {
             if (json.length() > 0) json += ", ";
   
-            json += "{\"id\":\"" + OAString.escapeJson(tav.id) + "\"" + 
+            json += "{\"guid\":\"" + OAString.escapeJson(tav.guid) + "\"" + 
                     ",\"display\":\"" + OAString.escapeJson(tav.display) + "\"";
             
             if (OAStr.isNotEmpty(tav.dropDownDisplay)) {

@@ -93,6 +93,11 @@ public abstract class OAUIController extends HubListenerAdapter {
      * object and acts as the root for property-based UI updates.
      */
     protected Hub hub;
+
+	protected boolean bUseLinkHub;
+	protected Hub hubLink; // link hub for Hub
+	protected String linkPropertyName;
+    
     
     /**
      * Indicates whether the controller should respond only to changes on the
@@ -389,12 +394,21 @@ public abstract class OAUIController extends HubListenerAdapter {
      * @param propertyPath the property path used to retrieve values.
      */
     public OAUIController(Hub hub, String propertyPath) {
-        this(hub, null, propertyPath, true, HubChangeListener.Type.AoNotNull);
+        this(hub, null, propertyPath, true, HubChangeListener.Type.AoNotNull, false);
     }    
 
     public OAUIController(Hub hub) {
-        this(hub, null, null, true, HubChangeListener.Type.AoNotNull);
+        this(hub, null, null, true, HubChangeListener.Type.AoNotNull, false);
     }    
+
+    public OAUIController(Hub hub, OAObject object, 
+            String propertyPath,
+            boolean bAoOnly, 
+            HubChangeListener.Type type) 
+    {
+    	this(hub, object, propertyPath, bAoOnly, type, false);
+    }
+    
     
     /**
      * Constructs a controller using the supplied Hub, optional single object,
@@ -410,13 +424,15 @@ public abstract class OAUIController extends HubListenerAdapter {
     public OAUIController(Hub hub, OAObject object, 
         String propertyPath,
         boolean bAoOnly, 
-        HubChangeListener.Type type) 
+        HubChangeListener.Type type, 
+        boolean bUseLinkHub) 
     {
         this.hub = hub;
         this.hubObject = object;
         this.propertyPath = propertyPath;
         this.bAoOnly = bAoOnly;
         this.hubChangeListenerType = type;
+        this.bUseLinkHub = bUseLinkHub;
 
         reset();
     }
@@ -473,6 +489,15 @@ public abstract class OAUIController extends HubListenerAdapter {
         if (hubLast != null) {
             hubLast.removeHubListener(this);
         }
+        
+		if (hubLink != null) {
+			getEnabledChangeListener().remove(hubLink);
+			if (bUseObjectCallback) {
+				getEnabledChangeListener().remove(hubLink, linkPropertyName);
+				getVisibleChangeListener().remove(hubLink, linkPropertyName);
+			}
+		}
+        
         if (hubObjectLast != null) {
             HubTemp.deleteHub(hubObjectLast);
         }
@@ -506,6 +531,7 @@ public abstract class OAUIController extends HubListenerAdapter {
             return;
         }
 
+        
         if (propertyPath != null && propertyPath.indexOf('.') >= 0) {
             hubListenerPropertyName = propertyPath.replace('.', '_'); // (com.cdi.model.oa.WebItem)B_WebPart_Title
             hub.addHubListener(this, hubListenerPropertyName, new String[] { propertyPath }, bAoOnly);
@@ -559,30 +585,58 @@ public abstract class OAUIController extends HubListenerAdapter {
         }
         bDefaultFormat = false;
 
-        if (bUseObjectCallback) {
-            Class cz = hub.getObjectClass();
-    		final OA oa = OARuntime.oa(cz);
-            String ppPrefix = "";
-            int cnt = 0;
-            for (String prop : properties) {
-                if (cnt == 0) {
-                    addEnabledObjectCallbackCheck(hub, prop);
-                    addVisibleObjectCallbackCheck(hub, prop);
-                }
-                else {
-                	oa.internal().objects().rules().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getEnabledChangeListener(), true);
-                	oa.internal().objects().rules().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getVisibleChangeListener(), false);
-                }
-                ppPrefix += prop + ".";
-                cz = oaPropertyPath.getClasses()[cnt++];
-            }
+		if (!bUseLinkHub) {
+	        if (bUseObjectCallback) {
+	            Class cz = hub.getObjectClass();
+	    		final OA oa = OARuntime.oa(cz);
+	            String ppPrefix = "";
+	            int cnt = 0;
+	            for (String prop : properties) {
+	                if (cnt == 0) {
+	                    addEnabledObjectCallbackCheck(hub, prop);
+	                    addVisibleObjectCallbackCheck(hub, prop);
+	                }
+	                else {
+	                	oa.internal().objects().rules().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getEnabledChangeListener(), true);
+	                	oa.internal().objects().rules().addObjectCallbackChangeListeners(hub, cz, prop, ppPrefix, getVisibleChangeListener(), false);
+	                }
+	                ppPrefix += prop + ".";
+	                cz = oaPropertyPath.getClasses()[cnt++];
+	            }
+	
+	            if (cnt == 0) {
+	                addEnabledObjectCallbackCheck(hub, null);
+	                addVisibleObjectCallbackCheck(hub, null);
+	            }
+	        }
+		}
+		else {
+			hubLink = hub.getLinkHub(true);
 
-            if (cnt == 0) {
-                addEnabledObjectCallbackCheck(hub, null);
-                addVisibleObjectCallbackCheck(hub, null);
-            }
-        }
+			if (hubLink != null) {
+				linkPropertyName = hub.getLinkPath(true);
+			} else {
+				Hub hubx = hub.getMasterHub();
+				//was: Hub hubx = HubDetailDelegate.getMasterHub(hub);
+				if (hubx != null) {
+					OALinkInfo li = getOA().internal().hubs().detail().getLinkInfoFromMasterToDetail(hub);
+					
+					//was: OALinkInfo li = HubDetailDelegate.getLinkInfoFromMasterToDetail(hub);
+					if (li != null && li.getType() == li.TYPE_ONE) {
+						hubLink = hubx;
+						linkPropertyName = li.getName();
+					}
+				}
+			}
 
+			if (hubLink != null) {
+				getEnabledChangeListener().add(hubLink, HubChangeListener.Type.AoNotNull);
+				if (bUseObjectCallback) {
+					addEnabledObjectCallbackCheck(hubLink, linkPropertyName);
+					addVisibleObjectCallbackCheck(hubLink, linkPropertyName);
+				}
+			}
+		}
         
         if (hub != null) {
             OAPropertyInfo pi = hub.getOAObjectInfo().getPropertyInfo(endPropertyName);
@@ -1189,11 +1243,14 @@ public abstract class OAUIController extends HubListenerAdapter {
      * @param fmt the format used for conversion.
      * @return the converted value.
      */
-    public Object getConvertedValue(Object value, String fmt) {
-        value = OAConv.convert(endPropertyClass, value, fmt);
-        return value;
-    }
+	public Object getConvertedValue(Object value, String fmt) {
+		if (hubLink == null && !bUseLinkHub) {
+			value = OAConv.convert(endPropertyClass, value, fmt);
+		}
+		return value;
+	}
 
+    
     /**
      * Tracks the HubProp used to enforce view-only behavior, typically restricting
      * edits unless the user has elevated privileges.
@@ -2696,6 +2753,66 @@ public abstract class OAUIController extends HubListenerAdapter {
     	return oa;
     }
 
+	/**
+	 * Used to confirm changing AO when hub is link to another hub.
+	 */
+	protected boolean confirmHubChangeAO(final Object objNew) {
+		if (!bUseLinkHub || hubLink == null) {
+			return true;
+		}
+		if (!(objNew instanceof OAObject)) {
+			return true;
+		}
+		return confirmPropertyChange(hubLink.getAO(), objNew);
+	}
+
+	
+//qqqqqqqqqq have OATypeAhead, OASelect, etc call this ... set *Jfc components qqqqqqqqqqqqq	
+	/**
+	 * Used to verify a property change.
+	 *
+	 * @return null if no errors, else error message
+	 */
+	protected String isValidHubChangeAO(final Object objNew) {
+		if (!bUseLinkHub || hubLink == null) {
+			return null;
+		}
+		if (!(objNew instanceof OAObject)) {
+			return null;
+		}
+
+		Object obj = hubLink.getAO();
+		if (!(obj instanceof OAObject)) {
+			return null;
+		}
+
+		OAObject oaObj = (OAObject) obj;
+		
+		OAObjectCallback em = getOA().internal().objects().rules().getVerifyPropertyChangeObjectCallback(oaObj, linkPropertyName, null, objNew);
+		//was: OAObjectCallback em = OAObjectCallbackDelegate.getVerifyPropertyChangeObjectCallback(OAObjectCallback.CHECK_ALL, oaObj, linkPropertyName, null, objNew);
+
+		String result = null;
+		if (!em.getAllowed()) {
+			result = em.getResponse();
+			Throwable t = em.getThrowable();
+			if (OAString.isEmpty(result)) {
+				if (t != null) {
+					for (; t != null; t = t.getCause()) {
+						result = t.getMessage();
+						if (OAString.isNotEmpty(result)) {
+							break;
+						}
+					}
+					if (OAString.isEmpty(result)) {
+						result = em.getThrowable().toString();
+					}
+				} else {
+					result = "invalid value";
+				}
+			}
+		}
+		return result;
+	}
     
     /**
      * Abstract method that subclasses must implement to update the UI component

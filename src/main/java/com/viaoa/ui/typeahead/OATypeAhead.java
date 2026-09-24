@@ -533,19 +533,18 @@ public class OATypeAhead<F extends OAObject,T extends OAObject> {
      * @param id the string identifier
      * @return the matching object, or null if not found
      */
-    public T findObjectUsingId(String id) {
+    public T findObjectUsingGuid(final String guid) {
 		final OA oa = OARuntime.oa(classTo);
-        final OAObjectKey ok = oa.internal().objects().key().createObjectKey(classTo, id);
-        
+		
         if (finder == null) {
             if (hub != null) {
                 for (T obj : ((Hub<T>)hub)) {
-                    if (oa.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
+                	if (obj.getObjectKey().getGuid().toString().equals(guid)) return obj;
                 }
             }
             else if (alTo != null) {
                 for (T obj : alTo) {
-                    if (oa.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok)) return obj;
+                	if (obj.getObjectKey().getGuid().toString().equals(guid)) return obj;
                 }
             }
         }
@@ -553,7 +552,7 @@ public class OATypeAhead<F extends OAObject,T extends OAObject> {
             OAFinder<F, T> finder2 = new OAFinder<F,T>(this.finderPropertyPath) {
                 @Override
                 protected boolean isUsed(T obj) {
-                    return oa.internal().objects().key().isForSameOAObject(null, obj.getObjectKey(), ok);
+                	return (obj.getObjectKey().getGuid().toString().equals(guid));
                 }
             };
                 
