@@ -997,6 +997,7 @@ public abstract class OAUIController extends HubListenerAdapter {
      * @return the formatted, possibly truncated value string.
      */
     public String getValueAsString(Object obj, final String fmt, final int maxLength) {
+    	obj = getRealObject(obj);
         String s;
         if (obj == null) s = "";
         else if (obj instanceof OAObject) {

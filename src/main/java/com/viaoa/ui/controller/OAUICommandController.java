@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import com.viaoa.callback.OAObjectCallback;
 import com.viaoa.hub.*;
+import com.viaoa.hub.link.HubSelectLink;
 import com.viaoa.hub.listener.HubChangeListener;
 import com.viaoa.lang.OAStr;
 import com.viaoa.log.OALogger;
@@ -642,6 +643,9 @@ public class OAUICommandController extends OAUIController {
             hub.setAO(obj);
             break;
         case Select:
+			HubSelectLink<?,?> hsl = hub.getSelectLink();
+			if (hsl == null) return false;
+			hsl.select();
             break;
         case Refresh:
             if (obj != null) obj.refresh();
